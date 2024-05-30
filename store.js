@@ -1,19 +1,29 @@
-
 import Vuex from 'vuex';
 import axios from 'axios';
 
-
-export default new Vuex.Store({
+const store = new Vuex.Store({
     state: {
-        user: null,
-        token: null
+        user: JSON.parse(localStorage.getItem('user')) || null,
+        token: localStorage.getItem('token') || null
     },
     mutations: {
         SET_USER(state, user) {
             state.user = user;
+            if (user) {
+                localStorage.setItem('user', JSON.stringify(user));
+            } else {
+                localStorage.removeItem('user');
+            }
         },
         SET_TOKEN(state, token) {
             state.token = token;
+            if (token) {
+                localStorage.setItem('token', token);
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            } else {
+                localStorage.removeItem('token');
+                delete axios.defaults.headers.common['Authorization'];
+            }
         }
     },
     actions: {
@@ -22,8 +32,6 @@ export default new Vuex.Store({
                 const response = await axios.post('/login', credentials);
                 commit('SET_USER', response.data.user);
                 commit('SET_TOKEN', response.data.token);
-                // Postavljanje tokena u Axios za buduće zahteve
-                axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
             } catch (error) {
                 console.error('Failed to login:', error);
                 throw error;
@@ -34,8 +42,6 @@ export default new Vuex.Store({
                 const response = await axios.post('/register', credentials);
                 commit('SET_USER', response.data.user);
                 commit('SET_TOKEN', response.data.token);
-                // Postavljanje tokena u Axios za buduće zahteve
-                axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
             } catch (error) {
                 console.error('Failed to register:', error);
                 throw error;
@@ -45,7 +51,6 @@ export default new Vuex.Store({
             await axios.post('/logout');
             commit('SET_USER', null);
             commit('SET_TOKEN', null);
-            delete axios.defaults.headers.common['Authorization'];
         },
         async fetchUser({ commit }) {
             const response = await axios.get('/user');
@@ -57,3 +62,5 @@ export default new Vuex.Store({
         getUser: state => state.user
     }
 });
+
+export default store;

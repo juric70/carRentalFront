@@ -10,7 +10,10 @@ import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 
 axios.defaults.baseURL = "http://127.0.0.1:8000/";
-
+axios.defaults.withCredentials = true;
+if (store.state.token) {
+  axios.defaults.headers.common['Authorization'] = `Bearer ${store.state.token}`;
+}
 const vuetify = new createVuetify({
   components,
   directives,

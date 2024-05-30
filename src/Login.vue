@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <h1>Login</h1>
+    <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
     <div class="form-container">
       <form @submit.prevent="submitLogin">
         <div class="input-group">
@@ -15,6 +16,8 @@
       </form>
     </div>
   </div>
+
+
 </template>
 
 <script>
@@ -24,7 +27,8 @@ export default {
   data() {
     return {
       email: '',
-      password: ''
+      password: '',
+      errorMessage: '',
     };
   },
   methods: {
@@ -38,7 +42,13 @@ export default {
         });
 
       } catch (error) {
-        console.error('Failed to login:', error);
+        if (error.status === 422) {
+          this.errorMessage = 'Invalid email or password';
+          return;
+        }else {
+          this.errorMessage = error.response.data.message;
+
+        }
       }
     }
   }
@@ -97,5 +107,9 @@ export default {
   
   .submit-button:hover {
     background-color: #5050a7;
+  }
+  .error-message {
+    color: red;
+    margin-bottom: 2px;
   }
   </style>

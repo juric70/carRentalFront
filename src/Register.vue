@@ -1,6 +1,8 @@
 <template>
   <div class="container">
     <h1>Register</h1>
+    <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+
     <div class="form-container">
       <form @submit.prevent="submitRegister">
         <div class="input-group">
@@ -36,7 +38,8 @@ export default {
       name: '',
       email: '',
       password: '',
-      password_confirmation: ''
+      password_confirmation: '',
+      errorMessage: '',
     };
   },
   methods: {
@@ -47,7 +50,10 @@ export default {
           this.$router.push('/');
         });
       } catch (error) {
-        alert(error.response.data);
+
+          this.errorMessage = error.response.data.message;
+
+
       }
     }
   }
@@ -55,6 +61,10 @@ export default {
 </script>
 
 <style scoped>
+.error-message {
+  color: red;
+  margin-bottom: 2px;
+}
 .container {
   display: flex;
   flex-direction: column;

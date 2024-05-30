@@ -1,6 +1,6 @@
 <template>
-  <div class="container">
-    <h1>Rental Index</h1>
+  <div class="container" v-if="getUser?.role_id === 2">
+    <h1>Create new rental</h1>
     <div class="form-container">
       <div class="form-group">
         <label for="car">Car</label>
@@ -82,11 +82,14 @@
       </div>
     </div>
   </div>
+  <div class="container" v-else>
+    <h1>Access denied</h1>
+  </div>
 </template>
 
 <script>
 import axios from "axios";
-
+import { mapGetters } from "vuex";
 export default {
   name: "create",
   data() {
@@ -120,6 +123,9 @@ export default {
   },
   created() {
     this.getData();
+  },
+  computed: {
+    ...mapGetters(["getUser"]),
   },
   methods: {
     async getData() {

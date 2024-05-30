@@ -1,14 +1,14 @@
 <template>
   <div class="container">
     <h1>Rental Index</h1>
-    <button class="create-button editDel" @click="createItem()">+ Create +</button>
+    <button v-if="getUser?.role_id === 2" class="create-button editDel" @click="createItem()">+ Create +</button>
     <table class="table">
       <thead>
         <tr style="color: #6363cb;">
           <th>ID</th>
           <th>Start date</th>
           <th>End date</th>
-          <th>Bill</th>
+          <th>Status</th>
           <th>User</th>
           <th>Car</th>
           <th>Car license plate</th>
@@ -20,13 +20,15 @@
           <td>{{ rental.id }}</td>
           <td>{{ rental.start_date }}</td>
           <td>{{ rental.end_date }}</td>
-          <td>{{ rental.bill.id }} - {{ rental.bill.status }}</td>
+          <td>{{ rental.bill.status }}</td>
           <td>{{ rental.bill.user?.name }}</td>
           <td>{{ rental.car.brand }} - {{ rental.car.model }}</td>
           <td>{{ rental.car.license_plate }}</td>
           <td>
-            <button @click="editItem(rental)" class="editDel" style="border: #6363cb 2px solid; color: #6363cb;">Edit</button>
-            <button @click="deleteItem(rental)" class="editDel" style="border: red 2px solid;color: red;">Delete</button>
+
+            <button @click="showMore(rental)" class="editDel" style="border: #6363cb 2px solid; color: #6363cb;">Show more</button>
+            <button v-if="getUser?.role_id === 2" @click="editItem(rental)" class="editDel" style="border: #6363cb 2px solid; color: #6363cb;">Edit</button>
+            <button v-if="getUser?.role_id === 2"  @click="deleteItem(rental)" class="editDel" style="border: red 2px solid;color: red;">Delete</button>
           </td>
         </tr>
       </tbody>
@@ -36,13 +38,16 @@
 
 <script>
 import axios from "axios";
-
+import { mapGetters } from "vuex";
 export default {
   name: "RentalIndex",
   data() {
     return {
       rentals: [],
     }
+  },
+  computed: {
+    ...mapGetters(["getUser"]),
   },
   mounted() {
     this.getRentals()
@@ -55,12 +60,14 @@ export default {
     },
     editItem(item) {
       this.$router.push(`/rental/edit/${item.id}`);
+    },showMore(item) {
+      this.$router.push(`/rental/${item.id}`);
     },
     createItem() {
       this.$router.push('/rental/create');
     },
     deleteItem(item) {
-      axios.delete(`/api/rentals/${item.id}`).then(() => {
+      axios.delete(`/api/rental/${item.id}`).then(() => {
         this.getRentals();
       });
     }
