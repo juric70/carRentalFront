@@ -2,7 +2,7 @@
   <header class="header">
     <h1 @click="goHome()" class="title">CAR RENTAL</h1>
     <div class="button-container">
-      <button @click="goToRentals()" class="login-button">Rentals</button>
+<!--      <button @click="goToRentals()" class="login-button">Rentals</button>-->
       <button @click="goToLogin()" v-if="!isAuthenticated" class="login-button">Login</button>
       <button @click="goToRegister()" v-if="!isAuthenticated" class="login-button">Register</button>
       <button @click="goToLogout()" v-if="isAuthenticated" class="login-button">Logout</button>
