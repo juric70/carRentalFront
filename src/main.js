@@ -1,6 +1,7 @@
 import "./assets/main.css";
 import { createVuetify } from "vuetify";
 import router from "../router";
+import store from "../store.js";
 import axios from "axios";
 
 import { createApp } from "vue";
@@ -15,4 +16,4 @@ const vuetify = new createVuetify({
   directives,
 });
 
-createApp(App).use(router).mount("#app");
+createApp(App).use(router).use(store).mount("#app");

@@ -1,5 +1,6 @@
 <template>
   <header class="header">
+
     <h1 @click="goHome()" class="title">CAR RENTAL</h1>
     <div class="button-container">
 <!--      <button @click="goToRentals()" class="login-button">Rentals</button>-->
@@ -7,10 +8,12 @@
       <button @click="goToRegister()" v-if="!isAuthenticated" class="login-button">Register</button>
       <button @click="goToLogout()" v-if="isAuthenticated" class="login-button">Logout</button>
     </div>
+
   </header>
 </template>
 
 <script>
+
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -64,6 +67,7 @@ export default {
   gap: 10px;
 }
 
+
 .title {
   margin: 0;
   color: white;
@@ -77,4 +81,6 @@ export default {
   color: white;
   background-color: #6363cb;
 }
+
 </style>
+

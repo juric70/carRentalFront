@@ -107,6 +107,7 @@ export default {
 .container {
   width: 100%;
   display: flex;
+
   justify-content: center;
   align-items: center;
   flex-direction: column;
