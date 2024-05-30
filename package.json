@@ -10,13 +10,11 @@
   },
   "dependencies": {
     "vue": "^3.4.21",
-<<<<<<< Updated upstream
-    "vuetify": "^3.5.9"
-=======
+
     "vue-router": "^4.3.2",
     "vuetify": "^3.6.5",
     "vuex": "^4.1.0"
->>>>>>> Stashed changes
+
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
