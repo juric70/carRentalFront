@@ -1,7 +1,8 @@
 <template>
   <div class="container">
-    <h1>Rental Index</h1>
-    <button v-if="getUser?.role_id === 2" class="create-button editDel" @click="createItem()">+ Create +</button>
+    <h1>Rentals</h1>
+    <button v-if="getUser?.role_id === 1" class="create-button editDel" @click="createItem()">+ Create +</button>
+    <button v-if="getUser?.role_id === 2" class="create-button editDel" @click="createAdminItem()">+ Create +</button>
     <table class="table">
       <thead>
         <tr style="color: #6363cb;">
@@ -27,7 +28,8 @@
           <td>
 
             <button @click="showMore(rental)" class="editDel" style="border: #6363cb 2px solid; color: #6363cb;">Show more</button>
-            <button v-if="getUser?.role_id === 2" @click="editItem(rental)" class="editDel" style="border: #6363cb 2px solid; color: #6363cb;">Edit</button>
+            <button v-if="getUser?.role_id === 1" @click="editItem(rental)" class="editDel" style="border: #6363cb 2px solid; color: #6363cb;">Edit</button>
+            <button v-if="getUser?.role_id === 2" @click="editAdmin(rental)" class="editDel" style="border: #6363cb 2px solid; color: #6363cb;">Edit Admin</button>
             <button v-if="getUser?.role_id === 2"  @click="deleteItem(rental)" class="editDel" style="border: red 2px solid;color: red;">Delete</button>
           </td>
         </tr>
@@ -54,9 +56,19 @@ export default {
   },
   methods: {
     async getRentals() {
-      axios.get('/api/rentals').then((response) => {
-        this.rentals = response.data
-      })
+      if(this.getUser?.role_id === 1){
+        axios.get('/api/showUserRental/' + this.getUser.id).then((response) => {
+          this.rentals = response.data
+        })
+      }else{
+        axios.get('/api/rentals').then((response) => {
+          this.rentals = response.data
+        })
+      }
+
+    },
+    editAdmin(item) {
+      this.$router.push(`/rental/edit/admin/${item.id}`);
     },
     editItem(item) {
       this.$router.push(`/rental/edit/${item.id}`);
@@ -66,10 +78,16 @@ export default {
     createItem() {
       this.$router.push('/rental/create');
     },
+    createAdminItem(){
+      this.$router.push('rental/create/admin');
+    },
     deleteItem(item) {
-      axios.delete(`/api/rental/${item.id}`).then(() => {
-        this.getRentals();
-      });
+      const confirmed = confirm("Are you sure you want to delete this rental?");
+      if (confirmed) {
+        axios.delete(`/api/rental/${item.id}`).then(() => {
+          this.getRentals();
+        });
+      }
     }
   }
 }

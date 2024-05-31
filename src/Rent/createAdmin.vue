@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" v-if="getUser?.role_id === 2">
     <h1>Create new rental</h1>
     <div class="form-container">
       <div class="form-group">
@@ -11,7 +11,7 @@
           </option>
         </select>
 
-
+        <button class="btn btn-secondary" @click="showCarForm = true" v-if="!showCarForm">Add new car +</button>
       </div>
       <div v-if="showCarForm" class="form-group">
         <label for="license_plate">License Plate</label>
@@ -62,23 +62,36 @@
       </div>
       <div class="form-group">
         <label for="bank">Start date</label>
-       <input type="date" class="form-control" id="bank" v-model="start_date">
-       <label for="bank">End date</label>
-       <input type="date" class="form-control" id="bank" v-model="end_date">
-
-
+        <input type="date" class="form-control" id="bank" v-model="start_date">
+        <label for="bank">End date</label>
+        <input type="date" class="form-control" id="bank" v-model="end_date">
+        <label for="bank">Total €</label>
+        <input type="number" class="form-control" id="bank" v-model="total">
+        <label for="bank">Status</label>
+        <select class="form-control" id="bank" v-model="status" >
+          <option  value="pending">Pending</option>
+          <option  value="paid">Paid</option>
+          <option  value="cancelled">Cancelled</option>
+          <option  value="completed">Completed</option>
+          <option  value="refunded">Refunded</option>
+          <option value="expired">Expired</option>
+          <option value="rejected">Rejected</option>
+          <option value="waiting">Waiting</option>
+        </select>
         <button class="btn btn-secondary" @click="submitForm">Submitt form</button>
       </div>
     </div>
   </div>
-
+  <div class="container" v-else>
+    <h1>Access denied</h1>
+  </div>
 </template>
 
 <script>
 import axios from "axios";
 import { mapGetters } from "vuex";
 export default {
-  name: "create",
+  name: "createAdmin",
   data() {
     return {
       showCarForm: false,
@@ -102,11 +115,11 @@ export default {
         code: '',
         user_id: null
       },
-      status: 'Unprocessed',
+      status: '',
       start_date: '',
       end_date: '',
-      total: 0,
-      
+      total: '',
+
     };
   },
   created() {
@@ -127,52 +140,50 @@ export default {
       console.log(this.selectedCar);
       if(this.selectedCar == null && this.selectedBank!==null){
         console.log(this.newCar);
-       data = {
-        car: this.newCar,
-        bank_id: this.selectedBank,
-        start_date: this.start_date,
-        end_date: this.end_date,
-        total: this.total,
-        status: this.status,
-        user_id: 1
-      }; 
+        data = {
+          car: this.newCar,
+          bank_id: this.selectedBank,
+          start_date: this.start_date,
+          end_date: this.end_date,
+          total: this.total,
+          status: this.status,
+          user_id: 1
+        };
       }else if (this.selectedCar !== null && this.selectedBank==null){
         this.newBank.user_id = this.getUser.id;
-        console.log(this.getUser);
-       data = {
-        car_id: this.selectedCar,
-        start_date: this.start_date,
-        end_date: this.end_date,
-        total: this.total,
-        status: this.status,
-        bank: this.newBank,
-        user_id: 1
-      };
-    }else if(this.selectedCar == null && this.selectedBank==null){
+        data = {
+          car_id: this.selectedCar,
+          start_date: this.start_date,
+          end_date: this.end_date,
+          total: this.total,
+          status: this.status,
+          bank: this.newBank,
+          user_id: 1
+        };
+      }else if(this.selectedCar == null && this.selectedBank==null){
         this.newBank.user_id = this.getUser.id;
-        console.log(this.getUser);
-      data = {
-        start_date: this.start_date,
-        end_date: this.end_date,
-        total: this.total,
-        status: this.status,
-        car: this.newCar,
-        bank: this.newBank,
-        user_id: 1
-      };
+        data = {
+          start_date: this.start_date,
+          end_date: this.end_date,
+          total: this.total,
+          status: this.status,
+          car: this.newCar,
+          bank: this.newBank,
+          user_id: 1
+        };
 
-    }else{
-      console.log('tu');
-       data = {
-        car_id: this.selectedCar,
-        bank_id: this.selectedBank,
-        start_date: this.start_date,
-        end_date: this.end_date,
-        total: this.total,
-        status: this.status,
-        user_id: 1
-      };
-    }
+      }else{
+        console.log('tu');
+        data = {
+          car_id: this.selectedCar,
+          bank_id: this.selectedBank,
+          start_date: this.start_date,
+          end_date: this.end_date,
+          total: this.total,
+          status: this.status,
+          user_id: 1
+        };
+      }
       axios.post('/api/rentals', data).then((response) => {
         console.log(response);
         this.$router.push('/rental');
@@ -191,7 +202,7 @@ export default {
       this.showCarForm = false;
       this.selectedCar = null;
     },
-   
+
   },
 };
 </script>
@@ -203,12 +214,12 @@ export default {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  padding-top: 60px; 
+  padding-top: 60px;
 }
 
 .form-container {
   width: 100%;
-  max-width: 50%; 
+  max-width: 50%;
 }
 
 .form-group {
@@ -224,7 +235,7 @@ export default {
 }
 
 .btn {
-  width: 100%; 
+  width: 100%;
   padding: 7px 20px;
   border: 1.5px solid #6363cb;
   border-radius: 5px;

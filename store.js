@@ -37,6 +37,7 @@ const store = new Vuex.Store({
                 throw error;
             }
         },
+
         async register({ commit }, credentials) {
             try {
                 const response = await axios.post('/register', credentials);

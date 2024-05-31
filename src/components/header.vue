@@ -3,7 +3,12 @@
 
     <h1 @click="goHome()" class="title">CAR RENTAL</h1>
     <div class="button-container">
+      <p class="greeting" v-if="isAuthenticated">Hello {{ getUser?.name }}</p>
     <button @click="goToRentals()" class="login-button">Rentals</button>
+    <button @click="goToCars()" class="login-button">Cars</button>
+    <button @click="goToBanks()" class="login-button">Banks</button>
+    <button v-if="getUser?.role_id === 1 || getUser?.role_id === 2" @click="editProfile()" class="login-button">Profile</button>
+    <button v-if="getUser?.role_id === 2" @click="goToUsers()" class="login-button">Users</button>
       <button @click="goToLogin()" v-if="!isAuthenticated" class="login-button">Login</button>
       <button @click="goToRegister()" v-if="!isAuthenticated" class="login-button">Register</button>
       <button @click="goToLogout()" v-if="isAuthenticated" class="login-button">Logout</button>
@@ -16,16 +21,31 @@
 <script>
 
 import { mapGetters, mapActions } from 'vuex';
+import editProfile from "@/Users/editProfile.vue";
 
 export default {
   name: "Header",
   computed: {
+
     ...mapGetters(['isAuthenticated']),
+    ...mapGetters(['getUser']),
 
   },
 
   methods: {
     ...mapActions(['logout']),
+    goToCars() {
+      this.$router.push('/cars');
+    },
+    editProfile() {
+      this.$router.push('/users/editProfile/' + this.getUser?.id);
+    },
+    goToUsers() {
+      this.$router.push('/users');
+    },
+    goToBanks() {
+      this.$router.push('/banks');
+    },
     goToRentals() {
       this.$router.push('/rental');
     },
@@ -82,6 +102,14 @@ export default {
   border: none;
   color: white;
   background-color: #6363cb;
+}
+
+.greeting {
+  margin: 0;
+  padding: 10px 20px;
+  font-size: 1.2em;
+  color: white;
+  border-radius: 5px;
 }
 
 </style>

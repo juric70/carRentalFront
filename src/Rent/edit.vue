@@ -1,5 +1,5 @@
 <template>
-  <div class="container" v-if="getUser?.role_id === 2">
+  <div class="container" v-if="getUser?.role_id === 1">
     <h1>Rental Edit</h1>
     <div class="form-container">
       <div class="form-group">
@@ -12,7 +12,6 @@
         </select>
       </div>
 
-      <button class="btn btn-secondary" @click="showCarForm = true" v-if="!showCarForm">Add new car +</button>
 
     <div v-if="showCarForm" class="form-group">
       <label for="license_plate">License Plate</label>
@@ -53,9 +52,9 @@
         <label for="bank_name">Bank Name</label>
         <input type="text" class="form-control" id="bank_name" v-model="newBank.name">
         <label for="code">Code</label>
-        <input type="expiry_date" class="form-control" id="code" v-model="newBank.expiry_date">
+        <input type="expiry_date" class="form-control" id="code" v-model="newBank.code">
         <label for="expiry_date">Expire date</label>
-        <input type="text" class="form-control" id="bank_name" v-model="newBank.name">
+        <input type="text" class="form-control" id="bank_name" v-model="newBank.expiry_date">
         <label for="cvv">CVV</label>
         <input type="text" class="form-control" id="cvv" v-model="newBank.cvv">
         <button class="btn btn-secondary" @click="showBankForm = false">Cancel</button>
@@ -72,24 +71,9 @@
         <input type="date" class="form-control" id="end_date" v-model="end_date">
       </div>
 
-      <div class="form-group">
-        <label for="total">Total €</label>
-        <input type="number" class="form-control" id="total" v-model="total">
-      </div>
 
-      <div class="form-group">
-        <label for="status">Status</label>
-        <select class="form-control" id="status" v-model="status">
-          <option value="pending">Pending</option>
-          <option value="paid">Paid</option>
-          <option value="cancelled">Cancelled</option>
-          <option value="completed">Completed</option>
-          <option value="refunded">Refunded</option>
-          <option value="expired">Expired</option>
-          <option value="rejected">Rejected</option>
-          <option value="waiting">Waiting</option>          
-        </select>
-      </div>
+
+
 
       <button class="btn btn-secondary" @click="submitForm">Update</button>
     </div>
@@ -123,7 +107,8 @@ export default {
         name: '',
         cvv: '',
         expiry_date: '',
-        code: ''
+        code: '',
+        user_id: null
       },
       cars: [],
       banks: [],
@@ -132,7 +117,7 @@ export default {
       start_date: '',
       end_date: '',
       total: '',
-      status: ''
+      status: 'Unprocessed'
     };
   },
   created() {
@@ -142,7 +127,7 @@ export default {
   },
   methods: {
     async getDataBillCar() {
-      axios.get('/api/getForCreate').then((response) => {
+      axios.get('/api/getForCreate/'+ this.getUser.id).then((response) => {
         this.cars = response.data.cars;
         this.banks = response.data.banks;
       });
@@ -176,6 +161,7 @@ console.log(rental_id);
 
         };
       }else if (this.newCar.license_plate === '' && this.newBank.name!==''){
+        this.newBank.user_id = this.getUser.id;
         data = {
           car_id: this.selectedCar,
           start_date: this.start_date,
@@ -186,6 +172,7 @@ console.log(rental_id);
 
         };
       }else if(this.newCar.license_plate !== '' && this.newBank.name!==''){
+        this.newBank.user_id = this.getUser.id;
         data = {
           start_date: this.start_date,
           end_date: this.end_date,

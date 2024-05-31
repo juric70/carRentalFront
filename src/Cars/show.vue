@@ -1,41 +1,58 @@
 <template>
   <div class="container">
     <button class="goBack" @click="goBack()">Go Back</button>
-    <h1>Rental Details</h1>
+    <h1>Car Details</h1>
     <button  v-if="getUser?.role_id === 2" class="create-button editDel" @click="editItem()">Edit</button>
     <button  v-if="getUser?.role_id === 2" class="create-button editDel" @click="deleteItem()">Delete</button>
     <div class="details-container">
       <div class="detail-group">
-        <label for="car">Car</label>
-        <p id="car">{{ rental.car.brand }} - {{ rental.car.model }} ({{ rental.car.year }})</p>
+        <label for="car">Model</label>
+        <p id="car"> {{ car.model }} </p>
       </div>
       <div class="detail-group">
-        <label for="bank">Bank</label>
-        <p id="bank">{{ rental.bill?.bank?.name }}</p>
+        <label for="bank">Brand</label>
+        <p id="bank">{{ car.brand }}</p>
       </div>
       <div class="detail-group">
-        <label for="bank">Total</label>
-        <p id="bank">{{ rental.bill?.total }} €</p>
+        <label for="bank">Year</label>
+        <p id="bank">{{ car.year }} €</p>
       </div>
 
 
       <div class="detail-group">
-        <label for="user">User</label>
-        <p id="user">{{ rental.bill?.user?.name }} ({{ rental.bill?.user?.email }})</p>
+        <label for="user">Color</label>
+        <p id="user">{{ car.color }}</p>
       </div>
 
       <div class="detail-group">
-        <label for="start_date">Start date</label>
-        <p id="start_date">{{ rental.start_date }}</p>
+        <label for="start_date">License plate</label>
+        <p id="start_date">{{ car.license_plate }}</p>
       </div>
       <div class="detail-group">
-        <label for="end_date">End date</label>
-        <p id="end_date">{{ rental.end_date }}</p>
+        <label for="end_date">Owner</label>
+        <p id="end_date">{{ car.user?.name }}</p>
       </div>
       <div class="detail-group">
-        <label for="status">Status</label>
-        <p id="status">{{ rental.bill?.status }}</p>
+        <label for="status">Customer support name</label>
+        <p id="status">{{ car.customer_service?.name }}</p>
       </div>
+      <div class="detail-group">
+        <label for="status">Customer support phone</label>
+        <p id="status">{{ car.customer_service?.phone }}</p>
+      </div>
+      <div class="detail-group">
+        <label for="status">Customer support email</label>
+        <p id="status">{{ car.customer_service?.email }}</p>
+      </div>
+      <div class="detail-group">
+        <label for="status">Customer support address</label>
+        <p id="status">{{ car.customer_service?.address }}</p>
+      </div>
+      <div class="detail-group">
+        <label for="status">Customer support address</label>
+        <p id="status">{{ car.customer_service?.city?.name }}</p>
+      </div>
+
 
     </div>
   </div>
@@ -45,10 +62,10 @@
 import axios from "axios";
 import { mapGetters } from "vuex";
 export default {
-  name: "show",
+  name: "CarsShow",
   data() {
     return {
-      rental: {
+      car: {
         car: {},
         bill: {
           bank: {},
@@ -58,7 +75,7 @@ export default {
     };
   },
   mounted() {
-    this.fetchRentalDetails();
+    this.fetchcarDetails();
   },
   computed: {
     ...mapGetters(["getUser"]),
@@ -68,26 +85,26 @@ export default {
       this.$router.go(-1);
     },
     editItem() {
-      this.$router.push(`/rental/edit/${this.rental.id}`);
+      this.$router.push(`/cars/edit/${this.car.id}`);
     },
     deleteItem() {
 
-      const confirmed = confirm("Are you sure you want to delete this rental?");
+      const confirmed = confirm("Are you sure you want to delete this car?");
       if (confirmed) {
-        axios.delete(`/api/rental/${this.rental.id}`).then(() => {
+        axios.delete(`/api/cars/${this.car.id}`).then(() => {
 
-          this.$router.push(`/rental`);
+          this.$router.push(`/cars`);
 
         });
       }
     },
-    async fetchRentalDetails() {
-      const rentalId = this.$route.params.id;
+    async fetchcarDetails() {
+      const carId = this.$route.params.id;
       try {
-        const response = await axios.get(`/api/rentals/${rentalId}`);
-        this.rental = response.data;
+        const response = await axios.get(`/api/cars/${carId}`);
+        this.car = response.data;
       } catch (error) {
-        console.error('Error fetching rental details:', error);
+        console.error('Error fetching car details:', error);
       }
     },
   },

@@ -1,18 +1,19 @@
 <template>
-  <div class="container">
-    <h1>Create new rental</h1>
+  <div class="container" v-if="getUser?.role_id === 2">
+    <h1>Rental Edit</h1>
     <div class="form-container">
       <div class="form-group">
         <label for="car">Car</label>
-        <select class="form-control" id="car" v-model="selectedCar" :disabled="showCarForm">
-          <option  value="" selected >Select car</option>
+        <select class="form-control" id="car" v-model="selectedCar">
+          <option disabled value="">Select car</option>
           <option v-for="car in cars" :key="car.id" :value="car.id">
             {{ car.brand }} - {{ car.model }}({{ car.year }})
           </option>
         </select>
-
-
       </div>
+
+      <button class="btn btn-secondary" @click="showCarForm = true" v-if="!showCarForm">Add new car +</button>
+
       <div v-if="showCarForm" class="form-group">
         <label for="license_plate">License Plate</label>
         <input type="text" class="form-control" id="license_plate" v-model="newCar.license_plate">
@@ -40,7 +41,7 @@
 
       <div class="form-group">
         <label for="bank">Bank</label>
-        <select class="form-control" id="bank" v-model="selectedBank" :disabled="showBankForm">
+        <select class="form-control" id="bank" v-model="selectedBank">
           <option disabled value="">Select bank</option>
           <option v-for="bank in banks" :key="bank.id" :value="bank.id">
             {{ bank.name }}
@@ -48,7 +49,6 @@
         </select>
         <button class="btn btn-secondary" @click="showBankForm = true" v-if="!showBankForm">Add new bank +</button>
       </div>
-
       <div v-if="showBankForm" class="form-group">
         <label for="bank_name">Bank Name</label>
         <input type="text" class="form-control" id="bank_name" v-model="newBank.name">
@@ -60,25 +60,53 @@
         <input type="text" class="form-control" id="cvv" v-model="newBank.cvv">
         <button class="btn btn-secondary" @click="showBankForm = false">Cancel</button>
       </div>
+
+
       <div class="form-group">
-        <label for="bank">Start date</label>
-       <input type="date" class="form-control" id="bank" v-model="start_date">
-       <label for="bank">End date</label>
-       <input type="date" class="form-control" id="bank" v-model="end_date">
-
-
-        <button class="btn btn-secondary" @click="submitForm">Submitt form</button>
+        <label for="start_date">Start date</label>
+        <input type="date" class="form-control" id="start_date" v-model="start_date">
       </div>
+
+      <div class="form-group">
+        <label for="end_date">End date</label>
+        <input type="date" class="form-control" id="end_date" v-model="end_date">
+      </div>
+
+      <div class="form-group">
+        <label for="total">Total €</label>
+        <input type="number" class="form-control" id="total" v-model="total">
+      </div>
+
+      <div class="form-group">
+        <label for="status">Status</label>
+        <select class="form-control" id="status" v-model="status">
+          <option value="pending">Pending</option>
+          <option value="paid">Paid</option>
+          <option value="cancelled">Cancelled</option>
+          <option value="completed">Completed</option>
+          <option value="refunded">Refunded</option>
+          <option value="expired">Expired</option>
+          <option value="rejected">Rejected</option>
+          <option value="waiting">Waiting</option>
+        </select>
+      </div>
+
+      <button class="btn btn-secondary" @click="submitForm">Update</button>
     </div>
   </div>
-
+  <div class="container" v-else>
+    <h1>Access denied</h1>
+  </div>
 </template>
 
 <script>
 import axios from "axios";
 import { mapGetters } from "vuex";
 export default {
-  name: "create",
+  name: "editWStatus",
+  computed: {
+    ...mapGetters(["getUser"]),
+  },
   data() {
     return {
       showCarForm: false,
@@ -90,10 +118,6 @@ export default {
         year: '',
         user_id: 1
       },
-      cars: [],
-      banks: [],
-      selectedCar: null,
-      selectedBank: null,
       showBankForm: false,
       newBank: {
         name: '',
@@ -102,97 +126,99 @@ export default {
         code: '',
         user_id: null
       },
-      status: 'Unprocessed',
+      cars: [],
+      banks: [],
+      selectedCar: null,
+      selectedBank: null,
       start_date: '',
       end_date: '',
-      total: 0,
-      
+      total: '',
+      status: ''
     };
   },
   created() {
     this.getData();
-  },
-  computed: {
-    ...mapGetters(["getUser"]),
+    this.getDataBillCar();
+
   },
   methods: {
-    async getData() {
+    async getDataBillCar() {
       axios.get('/api/getForCreate/'+ this.getUser.id).then((response) => {
         this.cars = response.data.cars;
         this.banks = response.data.banks;
       });
     },
-    async submitForm() {
-      let data = {};
-      console.log(this.selectedCar);
-      if(this.selectedCar == null && this.selectedBank!==null){
-        console.log(this.newCar);
-       data = {
-        car: this.newCar,
-        bank_id: this.selectedBank,
-        start_date: this.start_date,
-        end_date: this.end_date,
-        total: this.total,
-        status: this.status,
-        user_id: 1
-      }; 
-      }else if (this.selectedCar !== null && this.selectedBank==null){
-        this.newBank.user_id = this.getUser.id;
-        console.log(this.getUser);
-       data = {
-        car_id: this.selectedCar,
-        start_date: this.start_date,
-        end_date: this.end_date,
-        total: this.total,
-        status: this.status,
-        bank: this.newBank,
-        user_id: 1
-      };
-    }else if(this.selectedCar == null && this.selectedBank==null){
-        this.newBank.user_id = this.getUser.id;
-        console.log(this.getUser);
-      data = {
-        start_date: this.start_date,
-        end_date: this.end_date,
-        total: this.total,
-        status: this.status,
-        car: this.newCar,
-        bank: this.newBank,
-        user_id: 1
-      };
+    async getData() {
+      let rental_id = this.$route.params.id;
+      console.log(rental_id);
+      axios.get('/api/rental/'+ rental_id).then((response) => {
 
-    }else{
-      console.log('tu');
-       data = {
-        car_id: this.selectedCar,
-        bank_id: this.selectedBank,
-        start_date: this.start_date,
-        end_date: this.end_date,
-        total: this.total,
-        status: this.status,
-        user_id: 1
-      };
-    }
-      axios.post('/api/rentals', data).then((response) => {
+        this.selectedCar = response.data.car_id;
+        this.selectedBank = response.data.bill.bank_id;
+        this.start_date = response.data.start_date;
+        this.end_date = response.data.end_date;
+        this.total = response.data.bill.total;
+        this.status = response.data.bill.status;
+      });
+    },
+    async submitForm() {
+      let rental_id = this.$route.params.id;
+
+      let data;
+      if(this.newCar.license_plate !== '' && this.newBank.name===''){
+        console.log(this.newCar);
+        data = {
+          car: this.newCar,
+          bank_id: this.selectedBank,
+          start_date: this.start_date,
+          end_date: this.end_date,
+          total: this.total,
+          status: this.status,
+
+        };
+      }else if (this.newCar.license_plate === '' && this.newBank.name!==''){
+        this.newBank.user_id = this.getUser.id;
+        data = {
+          car_id: this.selectedCar,
+          start_date: this.start_date,
+          end_date: this.end_date,
+          total: this.total,
+          status: this.status,
+          bank: this.newBank,
+
+        };
+      }else if(this.newCar.license_plate !== '' && this.newBank.name!==''){
+        this.newBank.user_id = this.getUser.id;
+        data = {
+          start_date: this.start_date,
+          end_date: this.end_date,
+          total: this.total,
+          status: this.status,
+          car: this.newCar,
+          bank: this.newBank,
+
+        };
+
+      }else{
+        console.log('tu');
+        data = {
+          car_id: this.selectedCar,
+          bank_id: this.selectedBank,
+          start_date: this.start_date,
+          end_date: this.end_date,
+          total: this.total,
+          status: this.status,
+
+        };
+      }
+
+
+      axios.put(`/api/rentals/${rental_id}`, data).then((response) => {
         console.log(response);
         this.$router.push('/rental');
       });
-
-    },
-    addCar() {
-      this.newCar = {
-        license_plate: '',
-        model: '',
-        brand: '',
-        color: '',
-        year: '',
-        user_id: null
-      };
-      this.showCarForm = false;
-      this.selectedCar = null;
-    },
-   
-  },
+    }
+  }
 };
 </script>
 
@@ -200,15 +226,16 @@ export default {
 .container {
   width: 100%;
   display: flex;
+
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  padding-top: 60px; 
+  padding-top: 60px;
 }
 
 .form-container {
   width: 100%;
-  max-width: 50%; 
+  max-width: 50%;
 }
 
 .form-group {
@@ -224,7 +251,7 @@ export default {
 }
 
 .btn {
-  width: 100%; 
+  width: 100%;
   padding: 7px 20px;
   border: 1.5px solid #6363cb;
   border-radius: 5px;
