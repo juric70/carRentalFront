@@ -1,47 +1,23 @@
 <script setup>
 import HelloWorld from './components/HelloWorld.vue'
 import TheWelcome from './components/TheWelcome.vue'
+import AppHeader from "@/components/header.vue";
+import Header from "@/components/header.vue";
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+    <Header/>
+    
+      <RouterView class="full_screen"/>
+  
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+<style>
+.full_screen {
+  width: 100%;
+  margin: 0; /* Uklanja bilo kakve margine */
+  padding: 0; /* Uklanja bilo kakve paddinge */
+  box-sizing: border-box; /* Osigurava da padding i border ne utječu na ukupnu širinu */
 }
 </style>
